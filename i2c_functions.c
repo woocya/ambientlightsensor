@@ -47,7 +47,6 @@ uint8_t write(uint8_t reg, uint8_t data, uint8_t error_data)
 
 uint8_t read(uint8_t *array)
 {
-	TCNT1=0x0000;
 	start();
 	TWDR = SLA_R;   //   read           //Load SLA_R into TWDR Register. Clear TWINT bit in TWCR to start transmission of address
 	TWCR = (1<<TWINT) | (1<<TWEN);
