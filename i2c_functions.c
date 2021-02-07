@@ -28,15 +28,15 @@ uint8_t write(uint8_t reg, uint8_t data, uint8_t error_data)
 	TWDR = reg;       //Load code/register address into TWDR Register. Clear TWINT bit in TWCR to start transmission of address
 	TWCR = (1<<TWINT) | (1<<TWEN);
 	while (!(TWCR & (1<<TWINT)));  //Wait for TWINT Flag set. This indicates that the SLA+W has been transmitted, and ACK/NACK has been received.
-	if ((TWSR & 0xF8) != TW_MT_DATA_ACK)  //Check value of TWI Status Register. Mask prescaler bits. If status different from MT_SLA_ACK go to ERROR
+	if ((TWSR & 0xF8) != TW_MT_DATA_ACK)  //Check value of TWI Status Register. Mask prescaler bits. If status different from TW_MT_DATA_ACK go to ERROR
 		return TW_MT_DATA_NACK;
 	
 	if(error_data!=0)
 	{
-		TWDR = data;   //   SLA_W            //Load SLA_W into TWDR Register. Clear TWINT bit in TWCR to start transmission of address
+		TWDR = data;  //Load data into TWDR Register. Clear TWINT bit in TWCR to start transmission of address
 		TWCR = (1<<TWINT) | (1<<TWEN);
-		while (!(TWCR & (1<<TWINT)));  //Wait for TWINT Flag set. This indicates that the SLA+W has been transmitted, and ACK/NACK has been received.
-		if ((TWSR & 0xF8) != TW_MT_DATA_ACK)  //Check value of TWI Status Register. Mask prescaler bits. If status different from MT_SLA_ACK go to ERROR
+		while (!(TWCR & (1<<TWINT)));  //Wait for TWINT Flag set. This indicates that the data has been transmitted, and ACK/NACK has been received.
+		if ((TWSR & 0xF8) != TW_MT_DATA_ACK)  //Check value of TWI Status Register. Mask prescaler bits. If status different from TW_MT_DATA_ACK go to ERROR
 			return error_data;
 	}
 	
@@ -49,23 +49,23 @@ uint8_t read(uint8_t *array)
 {
 	TCNT1=0x0000;
 	start();
-	TWDR = SLA_R;   //   read           //Load SLA_W into TWDR Register. Clear TWINT bit in TWCR to start transmission of address
+	TWDR = SLA_R;   //   read           //Load SLA_R into TWDR Register. Clear TWINT bit in TWCR to start transmission of address
 	TWCR = (1<<TWINT) | (1<<TWEN);
-	while (!(TWCR & (1<<TWINT)));  //Wait for TWINT Flag set. This indicates that the SLA+W has been transmitted, and ACK/NACK has been received.
+	while (!(TWCR & (1<<TWINT)));  //Wait for TWINT Flag set. This indicates that the SLA+R has been transmitted, and ACK/NACK has been received.
 	
-	if ((TWSR & 0xF8) == TW_MR_SLA_ACK)  //Check value of TWI Status Register. Mask prescaler bits. If status different from MT_SLA_ACK go to ERROR
+	if ((TWSR & 0xF8) == TW_MR_SLA_ACK)  //Check value of TWI Status Register. Mask prescaler bits. If status different from TW_MR_SLA_ACK go to ERROR
 	{
 		TWCR = (1<<TWINT) | (1<<TWEA) | (1<<TWEN);
 		while (!(TWCR & (1<<TWINT)));
 		
-		if ((TWSR & 0xF8) == TW_MR_DATA_ACK)
+		if ((TWSR & 0xF8) == TW_MR_DATA_ACK) // Check value of TWI Status Register. Mask prescaler bits. If status different from TW_MR_DATA_ACK go to ERROR
 		{
-			array[0]=TWDR;
+			array[0]=TWDR; // reading first byte
 			TWCR = (1<<TWINT) | (1<<TWEN);
 			while (!(TWCR & (1<<TWINT)));
-			if ((TWSR & 0xF8) == TW_MR_DATA_NACK)
+			if ((TWSR & 0xF8) == TW_MR_DATA_NACK) // // Check value of TWI Status Register. Mask prescaler bits. If status different from TW_MR_DATA_NACK go to ERROR
 			{
-				array[1]=TWDR;
+				array[1]=TWDR; // reading second byte
 				stop();
 				return TW_MR_DATA_OK;
 			}
