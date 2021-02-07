@@ -42,7 +42,7 @@ int main(void)
 	uint16_t value=0;
 	uart_config();
 
-	TWSR |= (1<<TWPS0); // SCL configuration
+	TWSR |= (1<<TWPS0); // SCL configuration - 400kHz (according to sensor documentation)
 	TWBR = 0x03;
 	
    	write(MODE_CODE, 0, 0); // send an order of desired mode to use
