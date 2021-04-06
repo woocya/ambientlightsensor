@@ -6,6 +6,6 @@ BHI750VDI sensor controlled by Arduino Uno. Lets you check light level in the ro
 Project was created with Atmel Studio 7.0.
 
 ## How it works
-After successful setup system automatically sends measured value (in luxes) to the USART console. New result is shown every 120 ms as this is how much the sensor needs to actualise. Right after every measurement the result is saved in EEPROM on Arduino. 
+After successful setup system automatically sends measured value (in luxes) to the USART controlled console. New result is shown every 120 ms as this is how much the sensor needs to actualise. Right after every measurement the result is saved in EEPROM on Arduino. 
 
 Code is written in pure C, without Arduino libraries. Arduino and light sensor communicate using IIC (Inter-Integrated Circuit)/TWI (Two-Wire Interface).
